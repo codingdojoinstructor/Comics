@@ -22,11 +22,16 @@
   <script src="https://d10ajoocuyu32n.cloudfront.net/codiqa.ext.js"></script>
   <script src="phonegap.js"></script>
   <script>
+    var pictureSource,
+        destinationType;
+    
     //wait for PhoneGap to load
     document.addEventListener("deviceready", loaded, false);
     // PhoneGap is ready
     function loaded() {
         startWatch();
+        pictureSource=navigator.camera.PictureSourceType;
+        destinationType=navigator.camera.DestinationType;
     }
     // Start watching the acceleration
     function startWatch() {
@@ -54,14 +59,6 @@
         alert('onError!');
     }
 
-    var pictureSource,
-        destinationType
-        
-    document.addEventListener("deviceready",loaded,false);
-    function loaded() {
-      pictureSource=navigator.camera.PictureSourceType;
-      destinationType=navigator.camera.DestinationType;
-    }
     function getPhoto(imageData) {
         var smallImage = document.getElementById('smallImage');
         smallImage.style.display = 'block';
@@ -92,7 +89,7 @@
         </div>
         <div id="accelerometer"></div>
         <button onclick="capturePhoto();">Capture Photo</button> <br>
-        <img style="display:none;width:288px;" id="smallImage" src="" />
+        <img style="display:none;width:60px;height:60px;" id="smallImage" src="" />
         <ul data-role="listview" data-divider-theme="b" data-inset="true">
             <li data-role="list-divider" role="heading">
                 Comics
