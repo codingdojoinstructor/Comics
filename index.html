@@ -22,23 +22,57 @@
   <script src="https://d10ajoocuyu32n.cloudfront.net/codiqa.ext.js"></script>
   <script src="phonegap.js"></script>
   <script>
-        //first we want to wait for PhoneGap to load
-        document.addEventListener("deviceready", loaded, false)
-        //PhoneGap is loaded
-        function loaded(){
-            navigator.accelerometer.getCurrentAcceleration(onSuccess, onError);
+    //wait for PhoneGap to load
+    document.addEventListener("deviceready", loaded, false);
+    // PhoneGap is ready
+    function loaded() {
+        startWatch();
+    }
+    // Start watching the acceleration
+    function startWatch() {
+        // Update acceleration every 3 seconds
+        var options = { frequency: 3000 };
+        watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+    }
+    // Stop watching the acceleration
+    function stopWatch() {
+        if (watchID) {
+            navigator.accelerometer.clearWatch(watchID);
+            watchID = null;
         }
-        //Get the current Acceleration data if Successful
-        function onSuccess(acceleration){
-            alert('Acceleration X: ' + acceleration.x + '\n' +
-              'Acceleration Y: ' + acceleration.y + '\n' +
-              'Acceleration Z: ' + acceleration.z + '\n' +
-              'Timestamp: '      + acceleration.timestamp + '\n');
-        }
-        // alert if there is an error
-        function onError(){
-            alert("Error");
-        }
+    }
+    // Success
+    function onSuccess(acceleration) {
+        var element = document.getElementById('accelerometer');
+        element.innerHTML = 'Acceleration X: ' + acceleration.x + '<br />' +
+                            'Acceleration Y: ' + acceleration.y + '<br />' +
+                            'Acceleration Z: ' + acceleration.z + '<br />' +
+                            'Timestamp: '      + acceleration.timestamp + '<br />';
+    }
+     // Error
+    function onError() {
+        alert('onError!');
+    }
+
+    var pictureSource,
+        destinationType
+        
+    document.addEventListener("deviceready",loaded,false);
+    function loaded() {
+      pictureSource=navigator.camera.PictureSourceType;
+      destinationType=navigator.camera.DestinationType;
+    }
+    function getPhoto(imageData) {
+        var smallImage = document.getElementById('smallImage');
+        smallImage.style.display = 'block';
+        smallImage.src = "data:image/jpeg;base64," + imageData;
+    }
+    function capturePhoto() {
+        navigator.camera.getPicture(getPhoto, onFail, { quality: 50 });
+    }
+    function onFail(message) {
+        alert('Failed because: ' + message);
+    }
   </script>
 </head>
 <body>
@@ -56,6 +90,9 @@
         <div style="">
             <img style="width: 288px; height: px" src="http://www.nicewalpaper.com/wallpapers/charlie-brown-3-nice-wallpaper-1024x768.jpg">
         </div>
+        <div id="accelerometer"></div>
+        <button onclick="capturePhoto();">Capture Photo</button> <br>
+        <img style="display:none;width:288px;" id="smallImage" src="" />
         <ul data-role="listview" data-divider-theme="b" data-inset="true">
             <li data-role="list-divider" role="heading">
                 Comics
