@@ -22,16 +22,22 @@
   <script src="https://d10ajoocuyu32n.cloudfront.net/codiqa.ext.js"></script>
   <script src="phonegap.js"></script>
   <script>
+    
+    var pictureSource   // picture source
+      , destinationType; // sets the format of returned value
+
     //wait for PhoneGap to load
     document.addEventListener("deviceready", loaded, false);
     // PhoneGap is ready
     function loaded() {
+        pictureSource=navigator.camera.PictureSourceType;
+        destinationType=navigator.camera.DestinationType;
         startWatch();
     }
     // Start watching the acceleration
     function startWatch() {
         // Update acceleration every 3 seconds
-        var options = { frequency: 3000 };
+        var options = { frequency: 100 };
         watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
     }
     // Stop watching the acceleration
@@ -54,24 +60,77 @@
         alert('onError!');
     }
 
-    var pictureSource,
-        destinationType
-        
-    document.addEventListener("deviceready",loaded,false);
-    function loaded() {
-      pictureSource=navigator.camera.PictureSourceType;
-      destinationType=navigator.camera.DestinationType;
+    // picture logic
+
+    // Called when a photo is successfully retrieved
+    //
+    function onPhotoDataSuccess(imageData) {
+      // Uncomment to view the base64-encoded image data
+      // console.log(imageData);
+
+      // Get image handle
+      //
+      var smallImage = document.getElementById('smallImage');
+
+      // Unhide image elements
+      //
+      smallImage.style.display = 'block';
+
+      // Show the captured photo
+      // The inline CSS rules are used to resize the image
+      //
+      smallImage.src = "data:image/jpeg;base64," + imageData;
     }
-    function getPhoto(imageData) {
-        var smallImage = document.getElementById('smallImage');
-        smallImage.style.display = 'block';
-        smallImage.src = "data:image/jpeg;base64," + imageData;
+
+    // Called when a photo is successfully retrieved
+    //
+    function onPhotoURISuccess(imageURI) {
+      // Uncomment to view the image file URI
+      // console.log(imageURI);
+
+      // Get image handle
+      //
+      var largeImage = document.getElementById('largeImage');
+
+      // Unhide image elements
+      //
+      largeImage.style.display = 'block';
+
+      // Show the captured photo
+      // The inline CSS rules are used to resize the image
+      //
+      largeImage.src = imageURI;
     }
+
+    // A button will call this function
+    //
     function capturePhoto() {
-        navigator.camera.getPicture(getPhoto, onFail, { quality: 50 });
+      // Take picture using device camera and retrieve image as base64-encoded string
+      navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 50,
+        destinationType: destinationType.DATA_URL });
     }
+
+    // A button will call this function
+    //
+    function capturePhotoEdit() {
+      // Take picture using device camera, allow edit, and retrieve image as base64-encoded string
+      navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20, allowEdit: true,
+        destinationType: destinationType.DATA_URL });
+    }
+
+    // A button will call this function
+    //
+    function getPhoto(source) {
+      // Retrieve image file location from specified source
+      navigator.camera.getPicture(onPhotoURISuccess, onFail, { quality: 50,
+        destinationType: destinationType.FILE_URI,
+        sourceType: source });
+    }
+
+    // Called if something bad happens.
+    //
     function onFail(message) {
-        alert('Failed because: ' + message);
+      alert('Failed because: ' + message);
     }
   </script>
 </head>
@@ -92,7 +151,11 @@
         </div>
         <div id="accelerometer"></div>
         <button onclick="capturePhoto();">Capture Photo</button> <br>
-        <img style="display:none;width:288px;" id="smallImage" src="" />
+        <button onclick="capturePhotoEdit();">Capture Editable Photo</button> <br>
+        <button onclick="getPhoto(pictureSource.PHOTOLIBRARY);">From Photo Library</button><br>
+        <button onclick="getPhoto(pictureSource.SAVEDPHOTOALBUM);">From Photo Album</button><br>
+        <img style="display:none;width:60px;height:60px;" id="smallImage" src="" />
+        <img style="display:none;" id="largeImage" src="" />
         <ul data-role="listview" data-divider-theme="b" data-inset="true">
             <li data-role="list-divider" role="heading">
                 Comics
