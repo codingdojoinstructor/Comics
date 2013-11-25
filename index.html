@@ -28,17 +28,20 @@
 
     //wait for PhoneGap to load
     document.addEventListener("deviceready", loaded, false);
+
     // PhoneGap is ready
     function loaded() {
+        navigator.geolocation.getCurrentPosition(onGeoSuccess, onGeoError);
         pictureSource=navigator.camera.PictureSourceType;
         destinationType=navigator.camera.DestinationType;
         startWatch();
     }
+    
     // Start watching the acceleration
     function startWatch() {
         // Update acceleration every 3 seconds
         var options = { frequency: 100 };
-        watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+        watchID = navigator.accelerometer.watchAcceleration(onSuccess, onAccelError, options);
     }
     // Stop watching the acceleration
     function stopWatch() {
@@ -56,7 +59,7 @@
                             'Timestamp: '      + acceleration.timestamp + '<br />';
     }
      // Error
-    function onError() {
+    function onAccelError() {
         alert('onError!');
     }
 
@@ -131,6 +134,29 @@
     //
     function onFail(message) {
       alert('Failed because: ' + message);
+    }
+
+    // Geolocation code
+
+    // onSuccess Geolocation
+    //
+    function onGeoSuccess(position) {
+        var element = document.getElementById('geolocation');
+        element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
+                            'Longitude: '          + position.coords.longitude             + '<br />' +
+                            'Altitude: '           + position.coords.altitude              + '<br />' +
+                            'Accuracy: '           + position.coords.accuracy              + '<br />' +
+                            'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
+                            'Heading: '            + position.coords.heading               + '<br />' +
+                            'Speed: '              + position.coords.speed                 + '<br />' +
+                            'Timestamp: '          + position.timestamp                    + '<br />';
+    }
+
+    // onError Callback receives a PositionError object
+    //
+    function onGeoError(error) {
+        alert('code: '    + error.code    + '\n' +
+              'message: ' + error.message + '\n');
     }
   </script>
 </head>
